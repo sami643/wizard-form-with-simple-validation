@@ -1,9 +1,8 @@
-import { Button, message, Select, Steps, theme } from "antd";
+import { Button, Steps, theme } from "antd";
 import { useState } from "react";
 const WizardForm = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
-
   const [Name, setName] = useState("");
   const [PhoneNo, setPhoneNo] = useState("");
   const [Email, setEmail] = useState("");
@@ -13,6 +12,9 @@ const WizardForm = () => {
   const [nameErr, setNameErr] = useState();
   const [EmailErr, setEmailErr] = useState();
   const [PhoneNoErr, setPhoneNoErr] = useState();
+  const [areaErr, setAreaErr] = useState();
+  const [provinceErr, setProvinceErr] = useState();
+  const [countryErr, setCountryErr] = useState();
   const next = () => {
     if (current === 0) {
       if (Name === "" || Name === null) {
@@ -27,7 +29,32 @@ const WizardForm = () => {
       if (Name.length > 0 && Email.length > 0 && PhoneNo.length > 0) {
         setCurrent(current + 1);
       }
+    } else if (current === 1) {
+      if (Area === "" || Area === null) {
+        setAreaErr("د ساحی لیکل ضروری ده");
+      }
+      if (Country === "" || Country === null) {
+        setCountryErr("د وطن نوم لیکل اړین دی");
+      }
+      if (Province === "" || Province === null) {
+        setProvinceErr("د ولایت نوم لیکل اړین دی");
+      }
+      if (Area.length > 0 && Province.length > 0 && Country.length > 0) {
+        setCurrent(current + 1);
+      }
     }
+  };
+
+  const setDataToLocalStorage = () => {
+    const data = {
+      Name,
+      Email,
+      Area,
+      PhoneNo,
+      Country,
+      Province,
+    };
+    localStorage.setItem("formData", JSON.stringify(data));
   };
 
   const prev = () => {
@@ -45,7 +72,7 @@ const WizardForm = () => {
             setNameErr("");
           }}
         />
-        <span>{nameErr}</span>
+        <span style={{ color: "red" }}>{nameErr}</span>
       </div>
       <div class="form-group">
         <input
@@ -54,9 +81,10 @@ const WizardForm = () => {
           placeholder="Email"
           onChange={(e) => {
             setEmail(e.target.value);
+            setEmailErr("");
           }}
         />
-        <span>{EmailErr}</span>
+        <span style={{ color: "red" }}>{EmailErr}</span>
       </div>
       <div class="form-group">
         <input
@@ -65,13 +93,14 @@ const WizardForm = () => {
           placeholder="Phone"
           onChange={(e) => {
             setPhoneNo(e.target.value);
+            setPhoneNoErr("");
           }}
         />
-        <span>{PhoneNoErr}</span>
+        <span style={{ color: "red" }}>{PhoneNoErr}</span>
       </div>
     </form>,
     <>
-      <form style={{ margin: 10 }}>
+      <div style={{ margin: 10 }}>
         <div class="form-group">
           <input
             type="text"
@@ -79,8 +108,10 @@ const WizardForm = () => {
             placeholder="Area"
             onChange={(e) => {
               setArea(e.target.value);
+              setAreaErr("");
             }}
           />
+          <span style={{ color: "red" }}>{areaErr}</span>
         </div>
         <div class="form-group">
           <input
@@ -89,8 +120,10 @@ const WizardForm = () => {
             placeholder="Province"
             onChange={(e) => {
               setProvince(e.target.value);
+              setProvinceErr("");
             }}
           />
+          <span style={{ color: "red" }}>{provinceErr}</span>
         </div>
         <div class="form-group">
           <input
@@ -99,10 +132,12 @@ const WizardForm = () => {
             placeholder="Country"
             onChange={(e) => {
               setCountry(e.target.value);
+              setCountryErr("");
             }}
           />
+          <span style={{ color: "red" }}>{countryErr}</span>
         </div>
-      </form>
+      </div>
 
       <div
         style={{
@@ -198,7 +233,10 @@ const WizardForm = () => {
         {current === steps.length - 1 && (
           <Button
             type="primary"
-            onClick={() => alert("form Succesffuly submitted")}
+            onClick={() => {
+              alert("form Successfully submitted to local storage");
+              setDataToLocalStorage();
+            }}
           >
             Done
           </Button>
